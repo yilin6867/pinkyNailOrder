@@ -10,7 +10,7 @@ import traceback
 class Application():
 
     root = Tk()
-    CustomerRef = StringVar()
+    custName = StringVar()
     Tax = DoubleVar()
     SubTotal = DoubleVar()
     TotalCost = DoubleVar()
@@ -39,45 +39,49 @@ class Application():
     ##        RightInsideLF = Frame(RF, width = 604, height = 200, bd = 8, relief = "raise")
     ##        RightInsideLF.pack(side = TOP)
     RightInsideLFLF = Frame(RF, width = 306, height = 400, bd = 8, relief = "raise")
-    RightInsideRFRF = Frame(RF, width = 300, height = 400, bd = 8, relief = "raise")
+    #RightInsideRFRF = Frame(RF, width = 300, height = 400, bd = 8, relief = "raise")
 
 #============================================Bottom Left Frame =============================#
         
-    lblName = Label(LeftInsideLFLF, font = ('arial', 14, 'bold'), text = "Name",
-                       fg = "black", bd = 20)
-    lblWorkerName = Label(LeftInsideLFLF, font = ('arial', 14, 'bold'), text = "Worker Name",
+    lblWorkerName = Label(LeftInsideLFLF, font = ("arial", 14, "bold"), text = "Worker Name",
                             fg = "black", bd = 10, anchor = "w")
-    lblPrice = Label(LeftInsideLFLF, font = ('arial', 14, 'bold'), text = "Price",
+    lblPrice = Label(LeftInsideLFLF, font = ("arial", 14, "bold"), text = "Price",
                        fg = "black", bd = 20)
-    lblService = Label(LeftInsideLFLF, font = ('arial', 14, 'bold'), text = "Service",
+    lblService = Label(LeftInsideLFLF, font = ("arial", 14, "bold"), text = "Service",
                        fg = "black", bd = 20)
-    cmdService = ttk.Combobox(LeftInsideLFLF, font = ('arial', 10, 'bold'), width = 32)
-    cmdWorkerName = ttk.Combobox(LeftInsideLFLF, font = ('arial', 10, 'bold'), width = 20)
+    lblPolish = Label(LeftInsideLFLF, font = ("arial", 14, "bold"), text = "Polish Code",
+                      fg = "black", bd = 20)
+    lblCust = Label(LeftInsideLFLF, font = ("arial", 14, "bold"), text = "Customer Name",
+                    fg = "black", bd = 20)
+    cmdService = ttk.Combobox(LeftInsideLFLF, font = ("arial", 10, "bold"), width = 32)
+    cmdWorkerName = ttk.Combobox(LeftInsideLFLF, font = ("arial", 10, "bold"), width = 20)
+    cmdPolish = ttk.Combobox(LeftInsideLFLF, font = ("arial", 10, "bold"), width = 20)
 
-    lblService.grid(row = 1, column = 0)
+    txtCust = Entry(LeftInsideLFLF, font = ("arial", 12, "bold"), bd = 2, width = 20,
+                    bg = "white", justify = "left", textvariable = custName)
 
 #=============================================Right Frame ==========================#
-    lblMethodOfPayment = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Method of Payment",
+    lblMethodOfPayment = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Method of\n Payment",
                                 fg = "black", bd = 16, anchor = 'w')
-    cmdMethondOfPayment = ttk.Combobox(RightInsideLFLF, font = ('arial', 10, 'bold'))
+    cmdMethondOfPayment = ttk.Combobox(RightInsideLFLF, font = ('arial', 10, 'bold'), width =12)
     lblDiscount = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Discount",
                                 fg = "black", bd = 16, anchor = 'w')
-    txtDiscount = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 18,
+    txtDiscount = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 6,
                                 bg = "white", justify = 'left', textvariable = Discount)
     lblTax = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Tax",
                                 fg = "black", bd = 16, anchor = 'w')
-    txtTax = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 18,
+    txtTax = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 6,
                                 bg = "white", justify = 'left', textvariable = Tax)
     lblSubTotal = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Sub Total   ",
                                 fg = "black", bd = 16, anchor = 'w')
-    txtSubTotal = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 18,
+    txtSubTotal = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 6,
                                 bg = "white", justify = 'left', textvariable = SubTotal)
     lblTotalCost = Label(RightInsideLFLF, font = ('arial', 12, 'bold'), text = "Total Cost",
                          fg = "black", bd = 16, anchor = 'w')
-    txtTotalCost = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 18,
+    txtTotalCost = Entry(RightInsideLFLF, font = ('arial', 12, 'bold'), bd = 16, width = 6,
                                 bg = "white", justify = 'left', textvariable = TotalCost)
 
-#========================================import pinky nail order data============================#
+#========================================import pinky nail data============================#
     def pullData(cur, tableName):
         cur.execute("SELECT * FROM " + tableName);
         rawData = cur.fetchall()
@@ -91,8 +95,10 @@ class Application():
         cur = conn.cursor()
         serviceList = []
         workerList = []
+        polishCodeList = []
         serviceData = app.pullData(cur, "SERVICE")
         workerData = app.pullData(cur, "EMPLOYEE")
+        polishData = app.pullData(cur, "NAIL_POLISH")
         for row in range(len(serviceData)):
             serviceList.append([serviceData[row][1],serviceData[row][3]])
         for row in range(len(workerData)):
@@ -100,11 +106,12 @@ class Application():
                 workerList.append(workerData[row][1] +" " + workerData[row][3])
             else:
                 workerList.append(workerData[row][1] +" " + workerData[row][2] + " " + workerData[row][3])
-        print(serviceList)
-        print(workerList)
+        for row in range(len(polishData)):
+            polishCodeList.append(polishData[row][0])
+        print(polishCodeList)
         cur.close()
         conn.close()
-        return serviceList, workerList
+        return serviceList, workerList, polishCodeList
     #========================================= Button Command =======================================
     def Exit():
         qExit = messagebox.askyesno("Pinky Ordering System", "Do you want to exit the system")
@@ -130,9 +137,15 @@ class Application():
             app.storeOrder[n][0].grid_remove()
             app.storeOrder[n][1].grid_remove()
             app.storeOrder[n][2].grid_remove()
-            app.storeOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 1)
-            app.storeOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 2)
-            app.storeOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 3)
+            app.storeOrder[n][3].grid_remove()
+            app.storeOrder[n][4].grid_remove()
+            app.storeOrder[n][5].grid_remove()
+            app.storeOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 0)
+            app.storeOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 1)
+            app.storeOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 2)
+            app.storeOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 3)
+            app.storeOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 4)
+            app.storeOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 5)
         for n in range(len(app.serviceCancelBtn)):
             app.serviceCancelBtn[n].grid_remove()
             app.serviceCancelBtn[n].grid(row = n + 2, pady=0, ipady=0, column = 0)
@@ -160,6 +173,9 @@ class Application():
             app.storeOrder[n][0].grid_remove()
             app.storeOrder[n][1].grid_remove()
             app.storeOrder[n][2].grid_remove()
+            app.storeOrder[n][3].grid_remove()
+            app.storeOrder[n][4].grid_remove()
+            app.storeOrder[n][5].grid_remove()
         for n in range(len(app.serviceCancelBtn)):
             app.serviceCancelBtn[n].grid_remove()
         del app.storeOrder[:]
@@ -188,17 +204,31 @@ class Application():
                     orderID = 0 + 1
                 else:
                     orderID = int(currentOrderID[0]) + 1
-                cur.execute("SELECT ID FROM SERVICE WHERE NAME = '"+service+"'")
+                cur.execute("SELECT ID FROM SERVICE WHERE NAME = '"+service.get()+"'")
                 serviceId = cur.fetchone()
-                cur.execute("SELECT EMP_ID FROM EMPLOYEE WHERE = '"+service+"'")
+                
+                cur.execute("SELECT EMP_ID FROM EMPLOYEE WHERE = '"++"'")
+                workerId = cur.fetchone()
                 now = datetime.datetime.now().strftime("%m-%d-%Y %H:%M:%S")
-                app.WorkerName = app.txtWorkerName.get()
+                app.custName = app.txtCust.get().split()
+                cur.execute("SELECT CUST_ID FROM CUSTOMER WHERE F_NAME = '" + app.custName[0]+ "' AND MI = '" + app.custName[1] + "' AND L_NAME = '" +
+                                         app.custName[2] + "'")
+                returnCust = cur.fetchone()
+                if returnCust == None:
+                    cur.execute("SELECT CUST_ID FROM CUSTOMER ORDER BY CUST_ID DESC")
+                    returnCust = int(cur.fetchone()[0]) + 1
+                cur.execute("SELECT TRANS_ID FROM TRANSACTIONS ORDER BY TRANS_ID DESC")
+                currentTransId = cur.fetchone()
+                if currentTransId == None:
+                    transId = 0 + 1
+                else:
+                    transId = int(currentTransId[0]) + 1
                 print(app.totalCost)
                 print([orderID, now, str(app.WorkerName),str(app.storeLblService), str(app.storeLblWaxing),
                                   str(app.cmdMethondOfPayment.get()), str(app.Discount), str(app.Tax), str(app.SubTotal), app.totalCost])
-                sql = "INSERT INTO `ORDER`(ORDER_ID,SERVICE_ID,CUST_ID, EMP_ID, APPO_ID, TRANS_ID, PRICE) VALUES(?,?,?,?,?,?,?)"
-                cur.execute(sql, [orderID, serviceId, now, str(app.WorkerName),
-                                  str(app.cmdMethondOfPayment.get()), app.Discount, app.Tax, app.SubTotal, app.totalCost])
+                sql = "INSERT INTO `ORDER`(ORDER_ID,SERVICE_ID,CUST_ID, EMP_ID, APPO_ID, TRANS_ID, PRICE, ORDER_DATE) VALUES(?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [orderID, serviceId, returnCust, workerId, 'Null', transId, app.SubTotal, now])
+                                  #str(app.cmdMethondOfPayment.get()), app.Discount, app.Tax, app.SubTotal, app.totalCost])
                 conn.commit()
         except Exception as err:
             print(err)
@@ -207,7 +237,7 @@ class Application():
             conn.close()
                 
 #================================================ Grid Frame function =============================================
-    def frame(root, services, workerList):        
+    def frame(root, data):
         app.Tops.pack(side = TOP)
         app.LF.pack(side = LEFT)
         app.RF.pack(side = RIGHT)
@@ -215,59 +245,71 @@ class Application():
         app.LF.configure(background = 'black')
         app.RF.configure(background = 'black')
         
-        app.RightInsideRFRF.pack(side = RIGHT)
+#        app.RightInsideRFRF.pack(side = RIGHT)
         app.RightInsideLFLF.pack(side = LEFT)
         app.LeftInsideLFLF.pack(side = LEFT)
 
         app.lblInfor.grid(row = 0, column = 0)
 
-        app.bottomRightFrame(app.RightInsideLFLF, app.RightInsideRFRF)
-        app.lftFrame(app.LeftInsideLFLF, services, workerList)
+        app.bottomRightFrame(app.RightInsideLFLF)
+        app.lftFrame(app.LeftInsideLFLF, data)
 
-    def lftFrame(LeftInsideLFLF, services, workerList):
+    def lftFrame(LeftInsideLFLF, data):
         serviceName = []
-        for service in services:
+        for service in data[0]:
             serviceName.append(service[0])
-        app.lblName.grid(row = 0, column = 1)
         app.lblWorkerName.grid(row = 0, column = 2)
         app.lblPrice.grid(row = 0, column = 3)
-
+        app.lblService.grid(row = 0, column = 0)
+        app.lblPolish.grid(row = 0, column = 4)
+        app.lblCust.grid(row = 0, column = 1)
+        
         app.cmdWorkerName.grid(row = 1, column = 2)
-        app.cmdWorkerName['value'] = workerList
-        app.cmdService.grid(row = 1, column = 1)
-        app.cmdService.bind('<<ComboboxSelected>>', lambda event: app.displayPrice(services, app.cmdService, LeftInsideLFLF))        
+        app.cmdWorkerName['value'] = data[1]
+        app.cmdService.grid(row = 1, column = 0)
+        app.cmdService.bind('<<ComboboxSelected>>', lambda event: app.displayPrice(data[0], app.cmdService, LeftInsideLFLF))        
         app.cmdService['value'] = serviceName
+        app.cmdPolish.grid(row= 1, column = 4)
+        app.cmdPolish['value'] = data[2]
+        app.txtCust.grid(row = 1, column = 1)
         
         addBtn = Button(LeftInsideLFLF, pady = 0, bd = 8, fg = "black", font = ('arial', 14, 'bold'), width = 5,
                    text = "Add", bg = "white", command = lambda :
-                           app.addService(LeftInsideLFLF, services, app.cmdService, app.cmdWorkerName)).grid(row = 1, column = 4)
+                           app.addService(LeftInsideLFLF, data[0])).grid(row = 1, column = 5)
 
 #============================================Button LeftFrame Function ============================#
-    def addService(LeftInsideLFLF, services, cmdService, cmdWorker):
-        if (cmdWorker.get() != '' and cmdService.get() != ''):
+    def addService(LeftInsideLFLF, services):
+        if (app.cmdWorkerName.get() != '' and app.cmdService.get() != ''):
             lblStoreService = Label(LeftInsideLFLF, highlightthickness=0, borderwidth=0, pady=0, font = ('arial', 12, 'bold'),
-                                     text = cmdService.get(), fg = "black", bd = 0, anchor = "w")
-            lblStoreService.grid(row = len(app.storeLblService) + 2, pady=0, ipady=0, column = 1)
+                                     text = app.cmdService.get(), fg = "black", bd = 0, anchor = "w")
+            lblStoreService.grid(row = len(app.storeLblService) + 2, pady=0, ipady=0, column = 0)
             lblWrkAssign = Label(LeftInsideLFLF, highlightthickness=0, borderwidth=0, pady=0, font = ('arial', 12, 'bold'),
-                             text = cmdWorker.get(), fg = "black", bd = 0, anchor = "w")
+                             text = app.cmdWorkerName.get(), fg = "black", bd = 0, anchor = "w")
             lblWrkAssign.grid(row = len(app.storeLblService) + 2, pady = 0, ipady=0, column = 2)
+            lblStoreCust = Label(LeftInsideLFLF, highlightthickness=0, borderwidth=0, pady=0, font = ('arial', 12, 'bold'),
+                             text = app.txtCust.get() , fg = "black", bd = 5)
+            lblStoreCust.grid(row = len(app.storeLblService)+2, pady = 0, ipady=0, column = 1)
             lblStorePrice = Label(LeftInsideLFLF, highlightthickness=0, borderwidth=0, pady=0, font = ('arial', 12, 'bold'),
-                             text = "$%2d" % int(services[cmdService.current()][1]  ) , fg = "black", bd = 5)
+                             text = "$%2d" % int(services[app.cmdService.current()][1]  ) , fg = "black", bd = 5)
             lblStorePrice.grid(row = len(app.storeLblService) + 2, pady=0, ipady=0, column = 3)
-            app.storeOrder.append([lblStoreService, lblWrkAssign, lblStorePrice])
-            print(app.storeOrder)
+            lblStorePolish = Label(LeftInsideLFLF, highlightthickness=0, borderwidth=0, pady=0, font = ('arial', 12, 'bold'),
+                             text = app.cmdPolish.get() , fg = "black", bd = 5)
+            lblStorePolish.grid(row = len(app.storeLblService) + 2, pady = 0, ipady=0, column =4)
             cancelButton = Button(LeftInsideLFLF, pady = 0, padx = 0, bd = 0, fg = "black", font = ('arial', 8, 'bold'), width = 0,
-                               text = "X", bg = "white", command = lambda :
-                               app.cancelService(app.storeLblService, lblStoreService, lblStorePrice, lblWrkAssign,
-                                                  app.serviceCancelBtn[app.serviceCancelBtn.index(cancelButton)]))
-            cancelButton.grid(row = len(app.storeLblService) + 2, column = 0)
+                   text = "X", bg = "white", command = lambda :
+                   app.cancelService(app.storeLblService, lblStoreService, lblStorePrice, lblWrkAssign,
+                                      app.serviceCancelBtn[app.serviceCancelBtn.index(cancelButton)]))
+            cancelButton.grid(row = len(app.storeLblService) + 2, column = 5)
+            app.storeOrder.append([lblStoreService, lblStoreCust, lblWrkAssign, lblStorePrice, lblStorePolish, cancelButton])
+            print(app.storeOrder)
+
             app.storeLblService.append([lblStoreService['text'], lblWrkAssign['text'], lblStorePrice['text']])
             app.serviceCancelBtn.append(cancelButton)
         else:
             messagebox.showinfo("Warning", "Worker and Service can not be blank")
 
 #=============================================Button Right Frame==============================================#
-    def bottomRightFrame(RightInsideLFLF, RightInsideRFRF):
+    def bottomRightFrame(RightInsideLFLF):
         app.lblMethodOfPayment.grid(row = 0, column = 0)
         app.cmdMethondOfPayment['value'] = (' ', 'Cash', 'Debit Card', 'Visa Card', 'Master Card')
         app.cmdMethondOfPayment.grid(row = 0, column = 1)
@@ -279,21 +321,18 @@ class Application():
         app.txtSubTotal.grid(row = 3, column = 1)
         app.lblTotalCost.grid(row = 4, column = 0)
         app.txtTotalCost.grid(row = 4, column = 1)
-        app.buttonRightFrame(RightInsideRFRF)
-
-    def buttonRightFrame(RightInsideRFRF):
-        btnTotalCost = Button(RightInsideRFRF, pady = 8, bd = 8, fg = "black", font = ('arial', 16, 'bold'), width = 11,
-                              text = "Total Cost", bg = "white", command = app.totalCost).grid(row = 0, column = 0)
-        btnReset = Button(RightInsideRFRF, pady = 8, bd = 8, fg = "black", font = ('arial', 16, 'bold'), width = 11,
-                              text = "Reset", bg = "white", command = app.reset).grid(row = 1, column = 0)
-        btnSubmit = Button(RightInsideRFRF, pady = 8, bd = 8, fg = "black", font = ('arial', 16, 'bold'), width = 11,
-                              text = "Submit", bg = "white", command = app.submit).grid(row = 2, column = 0)
-        btnExit = Button(RightInsideRFRF, pady = 8, bd = 8, fg = "black", font = ('arial', 16, 'bold'), width = 11,
-                              text = "Exit", bg = "white", command = app.Exit).grid(row = 3, column = 0)
-
+        btnTotalCost = Button(RightInsideLFLF, pady = 8, bd = 8, fg = "black", font = ('arial', 12, 'bold'), width = 6,
+                              text = "Total \nCost", bg = "white", command = app.totalCost).grid(row = 1, column = 2)
+        btnReset = Button(RightInsideLFLF, pady = 8, bd = 8, fg = "black", font = ('arial', 12, 'bold'), width = 6,
+                              text = "Reset", bg = "white", command = app.reset).grid(row = 2, column = 2)
+        btnSubmit = Button(RightInsideLFLF, pady = 8, bd = 8, fg = "black", font = ('arial', 12, 'bold'), width = 6,
+                              text = "Submit", bg = "white", command = app.submit).grid(row = 3, column = 2)
+        btnExit = Button(RightInsideLFLF, pady = 8, bd = 8, fg = "black", font = ('arial', 12, 'bold'), width = 6,
+                              text = "Exit", bg = "white", command = app.Exit).grid(row = 4, column = 2)
+#add an appointment function that process in the back end using cust id
     def main():
         data = app.buildConnection()
-        Application.frame(Application.root, data[0], data[1])
+        Application.frame(Application.root, data)
         Application.root.update()
         Application.root.mainloop()
 
