@@ -23,7 +23,7 @@ class Application():
     root.configure(background='black')
     storeLblService = []
     serviceCancelBtn = []
-    storeOrder = []
+    storeLblOrder = []
     servicePrice = None
     
 
@@ -57,6 +57,7 @@ class Application():
     cmdWorkerName = ttk.Combobox(LeftInsideLFLF, font = ("arial", 10, "bold"), width = 20)
     cmdPolish = ttk.Combobox(LeftInsideLFLF, font = ("arial", 10, "bold"), width = 20)
 
+    custName.set("Anonymous")
     txtCust = Entry(LeftInsideLFLF, font = ("arial", 12, "bold"), bd = 2, width = 20,
                     bg = "white", justify = "left", textvariable = custName)
 
@@ -108,7 +109,6 @@ class Application():
                 workerList.append(workerData[row][1] +" " + workerData[row][2] + " " + workerData[row][3])
         for row in range(len(polishData)):
             polishCodeList.append(polishData[row][0])
-        print(polishCodeList)
         cur.close()
         conn.close()
         return serviceList, workerList, polishCodeList
@@ -124,31 +124,34 @@ class Application():
                          text = "$%2d" % int(services[cmdServices.current()][1]) , fg = "black", bd = 20)
         app.servicePrice.grid(row = 1, column = 3)
 
-    def cancelService(storeLblService, labelName, labelPrice, labelWorker, cancelButton):
-        print(app.storeOrder)
-        row = storeLblService.index([labelName['text'], labelWorker['text'], labelPrice['text']])
-        labelName.destroy()
-        labelPrice.destroy()
-        cancelButton.destroy()
-        app.serviceCancelBtn.remove(cancelButton)
-        app.storeOrder.remove([labelName, labelWorker, labelPrice])
-        app.storeLblService.pop(row)
-        for n in range(len(app.storeOrder)):
-            app.storeOrder[n][0].grid_remove()
-            app.storeOrder[n][1].grid_remove()
-            app.storeOrder[n][2].grid_remove()
-            app.storeOrder[n][3].grid_remove()
-            app.storeOrder[n][4].grid_remove()
-            app.storeOrder[n][5].grid_remove()
-            app.storeOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 0)
-            app.storeOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 1)
-            app.storeOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 2)
-            app.storeOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 3)
-            app.storeOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 4)
-            app.storeOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 5)
+    def cancelService(storeLblService, lblList):
+        for n in range(len(app.storeLblOrder)):   
+            app.storeLblOrder[n][0].grid_remove()
+            app.storeLblOrder[n][1].grid_remove()
+            app.storeLblOrder[n][2].grid_remove()
+            app.storeLblOrder[n][3].grid_remove()
+            app.storeLblOrder[n][4].grid_remove()
         for n in range(len(app.serviceCancelBtn)):
             app.serviceCancelBtn[n].grid_remove()
-            app.serviceCancelBtn[n].grid(row = n + 2, pady=0, ipady=0, column = 0)
+        row = app.storeLblService.index(lblList)
+        print(app.storeLblService, lblList, row)
+        del app.storeLblService[row]
+        del app.storeLblOrder[row]
+        del app.serviceCancelBtn[row]
+        print("This is store service:\n")
+        print(app.storeLblService)
+        print("This is store label:\n")
+        print(app.storeLblOrder)
+        print("This is store cancel btn:\n")
+        print(app.serviceCancelBtn)
+        for n in range(len(app.storeLblOrder)):
+            app.storeLblOrder[n][0].grid(row = n + 2, pady=0, ipady=0, column = 0)
+            app.storeLblOrder[n][1].grid(row = n + 2, pady=0, ipady=0, column = 1)
+            app.storeLblOrder[n][2].grid(row = n + 2, pady=0, ipady=0, column = 2)
+            app.storeLblOrder[n][3].grid(row = n + 2, pady=0, ipady=0, column = 3)
+            app.storeLblOrder[n][4].grid(row = n + 2, pady=0, ipady=0, column = 4)
+        for n in range(len(app.serviceCancelBtn)):
+            app.serviceCancelBtn[n].grid(row = n + 2, pady=0, ipady=0, column = 5)
             
     def totalCost():
         app.totalCost = 0
@@ -169,16 +172,16 @@ class Application():
         app.txtTotalCost.insert(0, format(app.totalCost, '.2f'))
 
     def reset():
-        for n in range(len(app.storeOrder)):
-            app.storeOrder[n][0].grid_remove()
-            app.storeOrder[n][1].grid_remove()
-            app.storeOrder[n][2].grid_remove()
-            app.storeOrder[n][3].grid_remove()
-            app.storeOrder[n][4].grid_remove()
-            app.storeOrder[n][5].grid_remove()
+        for n in range(len(app.storeLblOrder)):
+            app.storeLblOrder[n][0].grid_remove()
+            app.storeLblOrder[n][1].grid_remove()
+            app.storeLblOrder[n][2].grid_remove()
+            app.storeLblOrder[n][3].grid_remove()
+            app.storeLblOrder[n][4].grid_remove()
+            app.storeLblOrder[n][5].grid_remove()
         for n in range(len(app.serviceCancelBtn)):
             app.serviceCancelBtn[n].grid_remove()
-        del app.storeOrder[:]
+        del app.storeLblOrder[:]
         del app.storeLblService[:]
         app.servicePrice.grid_remove()
         app.txtSubTotal.delete(0, END)
@@ -297,13 +300,12 @@ class Application():
             lblStorePolish.grid(row = len(app.storeLblService) + 2, pady = 0, ipady=0, column =4)
             cancelButton = Button(LeftInsideLFLF, pady = 0, padx = 0, bd = 0, fg = "black", font = ('arial', 8, 'bold'), width = 0,
                    text = "X", bg = "white", command = lambda :
-                   app.cancelService(app.storeLblService, lblStoreService, lblStorePrice, lblWrkAssign,
-                                      app.serviceCancelBtn[app.serviceCancelBtn.index(cancelButton)]))
+                   app.cancelService(app.storeLblService, [lblStoreService['text'], lblStoreCust['text'], lblWrkAssign['text']
+                                                           , lblStorePrice['text'], lblStorePolish['text']]))
             cancelButton.grid(row = len(app.storeLblService) + 2, column = 5)
-            app.storeOrder.append([lblStoreService, lblStoreCust, lblWrkAssign, lblStorePrice, lblStorePolish, cancelButton])
-            print(app.storeOrder)
+            app.storeLblOrder.append([lblStoreService, lblStoreCust, lblWrkAssign, lblStorePrice, lblStorePolish, cancelButton])
 
-            app.storeLblService.append([lblStoreService['text'], lblWrkAssign['text'], lblStorePrice['text']])
+            app.storeLblService.append([lblStoreService['text'], lblStoreCust['text'], lblWrkAssign['text'], lblStorePrice['text'], lblStorePolish['text']])
             app.serviceCancelBtn.append(cancelButton)
         else:
             messagebox.showinfo("Warning", "Worker and Service can not be blank")
