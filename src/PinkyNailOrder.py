@@ -1,4 +1,5 @@
 import tkinter as tk
+import mysql.connector
 from tkinter import ttk
 
 class PinkyNailOrder:
@@ -29,14 +30,14 @@ class CustFrame:
         self.custFrame = tk.Frame(root, background=dbg) #create the pane
         self.custFrame.place(width=600,height=600, x=0,y=0)
         #create instruction
-        self.lblInstr = tk.Label(self.custFrame, font=('arial', 15, 'bold'),
+        self.lblInstr = tk.Label(self.custFrame, font=('arial', 15),
                             text='Please enter the customer information in the '+
                             'following entry', bg=dbg)
         self.lblInstr.place(height=25,width=580,x=0,y=10)
         #create id entry
         idValid = (root.register(self.idValidate),
                     '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        self.lblID = tk.Label(self.custFrame, font=('arial', 12, 'bold'),
+        self.lblID = tk.Label(self.custFrame, font=('arial', 12),
                          text='ID', bg=dbg)
         self.lblID.place(height=20,width=20,x=25,y=50)
         
@@ -60,7 +61,7 @@ class CustFrame:
 
         teleValid = (root.register(self.teleValidate),
                     '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        self.lblTele = tk.Label(self.custFrame, font=('arial', 12, 'bold'), text='Telephone',
+        self.lblTele = tk.Label(self.custFrame, font=('arial', 12), text='Telephone',
                                 bg=dbg)
         self.lblTele.place(height=20,width=90,x=20,y=80)
         self.teleEntry = tk.Entry(self.custFrame, font=('arial', 12), justify='left'
@@ -70,14 +71,14 @@ class CustFrame:
         #create first name entry
         nameValid = (root.register(self.nameValidate),
                      '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-        self.lblCustFN = tk.Label(self.custFrame, font = ('arial', 12, 'bold')
+        self.lblCustFN = tk.Label(self.custFrame, font = ('arial', 12)
                                   , text='First Name', bg=dbg)
         self.lblCustFN.place(height=20,width=90,x=22,y=110)
         self.custFNentry = tk.Entry(self.custFrame, font=('arial', 12), bg=dbg, justify='left',
                         textvariable=self.custFN, validate='key', validatecommand=nameValid)
         self.custFNentry.place(height=25,width=130,x=120,y=110)
         #create last name entry
-        self.lblCustLN = tk.Label(self.custFrame, font=('arial', 12, 'bold'), text='Last Name',
+        self.lblCustLN = tk.Label(self.custFrame, font=('arial', 12), text='Last Name',
                              justify='left',bg=dbg)
         self.lblCustLN.place(height=20,width=90,x=22,y=140)
         self.custLNentry = tk.Entry(self.custFrame, font=('arial', 12), bg=dbg, justify='left',
@@ -136,19 +137,45 @@ class CalOrdFrame:
                                  bg=dbg, justify='left')
         self.lblInstr.place(height=25,width=500,x=0,y=10)
 
-        self.lblType = tk.Label(self.calOrdFrame, font=('arial', 12, 'bold'),
+        self.lblType = tk.Label(self.calOrdFrame, font=('arial', 12),
                                  text='Service Type', bg=dbg)
         self.lblType.place(height=20,width=100,x=25,y=50)
         self.type = ttk.Combobox(self.calOrdFrame, font=('arial', 12), width=30,justify='left')
-        self.type['value']=self.getService('type')
-
-        self.name = ttk.Combobox(self.calOrdFrame, font=('arial', 12), width=100, justify='left')
+        self.type['value']=self.getService('TYPE')
+        self.type.bind('<<ComboboxSelected>>'
+                       , lambda event: self.updateSName(event, self.type.get()))
+        self.type.place(height=25, width=300, x=135, y=50)
         
+        self.lblName = tk.Label(self.calOrdFrame, font=('arial', 12),
+                                text='Service Name', bg=dbg)
+        self.lblName.place(height=20, width=105, x=25, y=85)
+        self.name = ttk.Combobox(self.calOrdFrame, font=('arial', 12), width=100, justify='left')
+        self.name.place(height=25, width=300, x=135, y=85)
 
-    def getService(self, keyword):
-        return []
-    
+        self.lblWorker = tk.Label(self.calOrdFrame, font=('arial', 12)
+                                  , text='Worker Name', bg=dbg)
 
+    def getService(self, keyword, where='WHERE 1 =1'):
+        mysqlDB = mysql.connector.connect(
+            host='localhost',
+            user='kjgmk',
+            passwd='Mysql@yilin@6867',
+            database='catolog'
+        )
+        mycursor = mysqlDB.cursor()
+        print(where)
+        mycursor.execute('SELECT DISTINCT '+ keyword +' FROM SERVICE '
+                         + where)
+        table = mycursor.fetchall()
+        myresult =[]
+        for row in table:
+            for col in row:
+                myresult.append(col)
+        print(myresult)
+        return myresult
+    def updateSName(self, event, where):
+        self.name['value']=self.getService('NAME', "WHERE TYPE = '" + where+"'")
+                                                          
 if __name__ == "__main__":
     root = tk.Tk()
     dbg = 'white'
